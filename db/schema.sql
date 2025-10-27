@@ -1,5 +1,6 @@
+# Use only in SQLite
 CREATE TABLE IF NOT EXISTS `agency`(
-    agency_id TEXT,
+    agency_id TEXT PRIMARY KEY,
     agency_name TEXT,
     agency_url TEXT,
     agency_timezone TEXT,
@@ -7,14 +8,8 @@ CREATE TABLE IF NOT EXISTS `agency`(
     agency_phone TEXT
 );
 
-CREATE TABLE IF NOT EXISTS `calendar_dates`(
-    service_id TEXT,
-    date TEXT,
-    exception_type TEXT
-);
-
 CREATE TABLE IF NOT EXISTS `calendar`(
-    service_id TEXT,
+    service_id TEXT PRIMARY KEY,
     monday TEXT,
     tuesday TEXT,
     wednesday TEXT,
@@ -26,6 +21,14 @@ CREATE TABLE IF NOT EXISTS `calendar`(
     end_date TEXT
 );
 
+CREATE TABLE IF NOT EXISTS `calendar_dates`(
+    service_id TEXT,
+    date TEXT,
+    exception_type TEXT,
+    FOREIGN KEY(service_id) REFERENCES calendar(service_id),
+    PRIMARY KEY(service_id, date)
+);
+
 CREATE TABLE IF NOT EXISTS `feed_info`(
     feed_publisher_name TEXT,
     feed_publisher_url TEXT,
@@ -35,7 +38,7 @@ CREATE TABLE IF NOT EXISTS `feed_info`(
 );
 
 CREATE TABLE IF NOT EXISTS `routes`(
-    route_id TEXT,
+    route_id TEXT PRIMARY KEY,
     route_short_name TEXT,
     route_long_name TEXT,
     route_desc TEXT,
@@ -45,8 +48,29 @@ CREATE TABLE IF NOT EXISTS `routes`(
     route_text_color TEXT
 );
 
+CREATE TABLE IF NOT EXISTS `shapes`(
+    shape_id TEXT,
+    shape_pt_lat TEXT,
+    shape_pt_lon TEXT,
+    shape_pt_sequence TEXT,
+    PRIMARY KEY(shape_id, shape_pt_sequence)
+);
+
+CREATE TABLE IF NOT EXISTS `trips`(
+    route_id TEXT,
+    service_id TEXT,
+    trip_id TEXT PRIMARY KEY,
+    trip_headsign TEXT,
+    direction_id TEXT,
+    block_id TEXT,
+    shape_id TEXT,
+    FOREIGN KEY(route_id) REFERENCES routes(route_id),
+    FOREIGN KEY(service_id) REFERENCES calendar(service_id),
+    FOREIGN KEY(shape_id) REFERENCES shapes(shape_id)
+);
+
 CREATE TABLE IF NOT EXISTS `stops`(
-    stop_id TEXT,
+    stop_id TEXT PRIMARY KEY,
     stop_code TEXT,
     stop_name TEXT,
     stop_desc TEXT,
@@ -66,33 +90,19 @@ CREATE TABLE IF NOT EXISTS `stop_times`(
     stop_id TEXT,
     stop_sequence TEXT,
     pickup_type TEXT,
-    drop_off_type TEXT
-);
-
-CREATE TABLE IF NOT EXISTS `shapes`(
-    shape_id TEXT,
-    shape_pt_lat TEXT,
-    shape_pt_lon TEXT,
-    shape_pt_sequence TEXT
-);
-
-CREATE TABLE IF NOT EXISTS `trips`(
-    route_id TEXT,
-    service_id TEXT,
-    trip_id TEXT,
-    trip_headsign TEXT,
-    direction_id TEXT,
-    block_id TEXT,
-    shape_id TEXT
+    drop_off_type TEXT,
+    FOREIGN KEY(trip_id) REFERENCES trips(trip_id),
+    FOREIGN KEY(stop_id) REFERENCES stops(stop_id),
+    PRIMARY KEY(trip_id, stop_sequence)
 );
 
 .mode csv
 
-.import '../data/agency.txt' agency;
-.import '../data/calendar_dates.txt' calendar_dates;
-.import '../data/feed_info.txt' feed_info;
-.import '../data/routes.txt' routes;
-.import '../data/shapes.txt' shapes;
-.import '../data/stop_times.txt' stop_times;
-.import '../data/stops.txt' stops;
-.import '../data/trips.txt' trips;
+.import '../data/agency.txt' agency
+.import '../data/calendar_dates.txt' calendar_dates
+.import '../data/feed_info.txt' feed_info
+.import '../data/routes.txt' routes
+.import '../data/shapes.txt' shapes
+.import '../data/stop_times.txt' stop_times
+.import '../data/stops.txt' stops
+.import '../data/trips.txt' trips
