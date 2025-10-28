@@ -1,4 +1,3 @@
-# Use only in SQLite
 CREATE TABLE IF NOT EXISTS `agency`(
     agency_id TEXT PRIMARY KEY,
     agency_name TEXT,
@@ -50,8 +49,8 @@ CREATE TABLE IF NOT EXISTS `routes`(
 
 CREATE TABLE IF NOT EXISTS `shapes`(
     shape_id TEXT,
-    shape_pt_lat TEXT,
-    shape_pt_lon TEXT,
+    shape_pt_lat REAL,
+    shape_pt_lon REAL,
     shape_pt_sequence TEXT,
     PRIMARY KEY(shape_id, shape_pt_sequence)
 );
@@ -74,8 +73,8 @@ CREATE TABLE IF NOT EXISTS `stops`(
     stop_code TEXT,
     stop_name TEXT,
     stop_desc TEXT,
-    stop_lat TEXT,
-    stop_lon TEXT,
+    stop_lat REAL,
+    stop_lon REAL,
     zone_id TEXT,
     stop_url TEXT,
     location_type TEXT,
